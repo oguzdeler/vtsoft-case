@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Comments</title>
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<style>
+		body {
+			background-color: #f9f9f9;
+			font-family: Arial, sans-serif;
+		}
+		.container {
+			max-width: 800px;
+		}
+		.comment {
+			background-color: #fff;
+			margin: 20px 0;
+			padding: 20px;
+			border: 1px solid #ddd;
+			border-radius: 8px;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		}
+		.comment h2 {
+			font-size: 18px;
+			font-weight: bold;
+			color: #333;
+			margin-bottom: 10px;
+		}
+		.comment p {
+			font-size: 16px;
+			line-height: 1.5;
+			color: #555;
+			margin-bottom: 15px;
+		}
+		.nested-comment {
+			margin-left: 20px;
+		}
+		.reply-btn {
+			background-color: #ff9800;
+			color: #fff;
+			border: none;
+			padding: 5px 15px;
+			border-radius: 4px;
+			font-size: 14px;
+			cursor: pointer;
+		}
+		.reply-btn:hover {
+			background-color: #f57c00;
+		}
+		.reply-btn:disabled {
+			background-color: #ddd;
+			cursor: not-allowed;
+		}
+		.load-more-btn {
+			display: block;
+			margin: 20px auto;
+			background-color: #ff9800;
+			color: #fff;
+			border: none;
+			padding: 10px 20px;
+			border-radius: 4px;
+			font-size: 16px;
+			cursor: pointer;
+		}
+		.load-more-btn:hover {
+			background-color: #f57c00;
+		}
+	</style>
+</head>
+<body>
+	<div class="container mt-5">
+		<h1 class="text-center">Yorumlar</h1>
+		<div id="comments-container"></div>
+	</div>
+
+	<script>
+		$(document).ready(function () {
+			const commentsContainer = $("#comments-container");
+			const loadMoreButton = $("#load-more-btn");
+
+			loadComments();
+
+			function loadComments() {
+				$.getJSON('comments.json', function (data) {
+					data.comments.forEach(function (comment) {
+						const commentElement = createCommentElement(comment);
+						commentsContainer.append(commentElement);
+					});
+				});
+			}
+
+			function createCommentElement(comment) {
+				const commentDiv = $("<div>").addClass("comment");
+				const commentTitle = $("<h2>").text(comment.title);
+				const commentContent = $("<p>").text(comment.content);
+				const commentToComment = $("<p>").text(comment.comment_to_comment);
+				const replyButton = $("<button>").addClass("btn btn-sm btn-secondary reply-btn").text("Reply");
+				const nestedComments = $("<div>").addClass("nested-comment");
+
+				commentDiv.append(commentTitle, commentContent, commentToComment, replyButton, nestedComments);
+
+				if (comment.comment_to_comment) {
+					const nestedCommentDiv = $("<div>").addClass("comment");
+					const nestedCommentText = $("<p>").text(comment.comment_to_comment);
+					nestedCommentDiv.append(nestedCommentText);
+					nestedComments.append(nestedCommentDiv);
+
+					replyButton.click(function () {
+						nestedCommentDiv.toggle();
+					});
+				} else {
+					replyButton.prop("disabled", true);
+				}
+
+				return commentDiv;
+			}
+
+			loadMoreButton.click(function () {
+			});
+		});
+	</script>
+
+</body>
+</html>
